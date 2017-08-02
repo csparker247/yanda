@@ -78,15 +78,13 @@ public:
     /** @brief Element access */
     T& operator()(ItemIndex index)
     {
-        Index dIndex = 0;
-        for (auto it = 0; it < extents_.size(); it++) {
-            auto begin = std::next(extents_.begin(), it + 1);
-            auto offset = std::accumulate(
-                begin, extents_.end(), Index(1), std::multiplies<Index>());
-            dIndex += index[it] * offset;
-        }
+        return data_.at(item_index_to_data_index_(index));
+    }
 
-        return data_.at(dIndex);
+    /** @overload T& operator()(ItemIndex index) */
+    const T& operator()(ItemIndex index) const
+    {
+        return data_.at(item_index_to_data_index_(index));
     }
 
     /** @brief Get slice of array by dropping highest dimension */
@@ -114,5 +112,63 @@ private:
     Extent extents_;
     /** Data storage */
     Container data_;
+
+    /** Convert item index to data index */
+    inline Index item_index_to_data_index_(ItemIndex i) const
+    {
+        Index idx{0};
+        for (auto it = 0; it < extents_.size(); it++) {
+            auto begin = std::next(extents_.begin(), it + 1);
+            auto offset = std::accumulate(
+                begin, extents_.end(), Index(1), std::multiplies<Index>());
+            idx += i[it] * offset;
+        }
+
+        return idx;
+    }
 };
+
+/* Utilities */
+// Print a 2D array
+template <typename T>
+void Print(const NDimensionalArray<T, 2>& a)
+{
+    using Index = typename NDimensionalArray<T, 2>::Index;
+    for (Index y = 0; y < a.extents()[0]; y++) {
+        std::cout << "[";
+        for (Index x = 0; x < a.extents()[1]; x++) {
+            std::cout << a({y, x});
+            if (x != a.extents()[1] - 1) {
+                std::cout << ",";
+            }
+        }
+        std::cout << "]" << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+// Print a 3D array
+template <typename T>
+void Print(const NDimensionalArray<T, 3>& a)
+{
+    using Index = typename NDimensionalArray<T, 3>::Index;
+    for (Index z = 0; z < a.extents()[0]; z++) {
+        std::cout << "[";
+        for (Index y = 0; y < a.extents()[1]; y++) {
+            std::cout << "[";
+            for (Index x = 0; x < a.extents()[2]; x++) {
+                std::cout << a({z, y, x});
+                if (x != a.extents()[2] - 1) {
+                    std::cout << ",";
+                }
+            }
+            std::cout << "]";
+            if (y != a.extents()[1] - 1) {
+                std::cout << ",";
+            }
+        }
+        std::cout << "]" << std::endl;
+    }
+    std::cout << std::endl;
+}
 }
