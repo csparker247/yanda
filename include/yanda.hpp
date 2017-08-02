@@ -16,11 +16,11 @@ public:
     /** Storage container alias */
     using Container = std::vector<T>;
     /** Container index type */
-    using DataIndex = typename Container::size_type;
+    using Index = typename Container::size_type;
     /** Extents type */
-    using Extent = std::array<DataIndex, N>;
+    using Extent = std::array<Index, N>;
     /** N-Dim Array Index type */
-    using ItemIndex = std::array<DataIndex, N>;
+    using ItemIndex = std::array<Index, N>;
     /** Slice type */
     using Slice = NDimensionalArray<T, N - 1>;
 
@@ -31,7 +31,7 @@ public:
     explicit NDimensionalArray(Extent e) : extents_(e)
     {
         auto size = std::accumulate(
-            e.begin(), e.end(), DataIndex(1), std::multiplies<DataIndex>());
+            e.begin(), e.end(), Index(1), std::multiplies<Index>());
 
         if (size == 0) {
             throw std::range_error("Array extent is zero");
@@ -47,6 +47,12 @@ public:
         typename Container::iterator last)
         : extents_(e), data_{first, last}
     {
+        auto size = std::accumulate(
+            e.begin(), e.end(), Index(1), std::multiplies<Index>());
+
+        if (size != data_.size()) {
+            throw std::range_error("Array extent does not match input data");
+        }
     }
 
     /** @brief Set the extent of the array's dimensions
@@ -55,15 +61,14 @@ public:
      */
     void setExtents(Extent e)
     {
-        extents_ = e;
-
         auto size = std::accumulate(
-            e.begin(), e.end(), DataIndex(1), std::multiplies<DataIndex>());
+            e.begin(), e.end(), Index(1), std::multiplies<Index>());
 
         if (size == 0) {
             throw std::range_error("Array extent is zero");
         }
 
+        extents_ = e;
         data_.resize(size);
     }
 
@@ -73,24 +78,23 @@ public:
     /** @brief Element access */
     T& operator()(ItemIndex index)
     {
-        DataIndex dIdx = 0;
+        Index dIndex = 0;
         for (auto it = 0; it < extents_.size(); it++) {
             auto begin = std::next(extents_.begin(), it + 1);
             auto offset = std::accumulate(
-                begin, extents_.end(), DataIndex(1),
-                std::multiplies<DataIndex>());
-            dIdx += index[it] * offset;
+                begin, extents_.end(), Index(1), std::multiplies<Index>());
+            dIndex += index[it] * offset;
         }
 
-        return data_.at(dIdx);
+        return data_.at(dIndex);
     }
 
     /** @brief Get slice of array by dropping highest dimension */
-    Slice slice(DataIndex index)
+    Slice slice(Index index)
     {
         auto offset = std::accumulate(
-            std::next(extents_.begin(), 1), extents_.end(), DataIndex(1),
-            std::multiplies<DataIndex>());
+            std::next(extents_.begin(), 1), extents_.end(), Index(1),
+            std::multiplies<Index>());
 
         auto b = std::next(data_.begin(), index * offset);
         auto e = std::next(data_.begin(), (index + 1) * offset);

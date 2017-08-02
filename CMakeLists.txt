@@ -13,14 +13,6 @@ target_include_directories(yanda
         $<INSTALL_INTERFACE:include>
 )
 
-## Example App
-#add_executable(HXTIO-Example HXTIO-Example.cpp)
-#target_link_libraries(HXTIO-Example hxtio)
-
-## OpenCV Example App
-#option(HXT_USE_OPENCV "Use OpenCV library" off)
-#if(HXT_USE_OPENCV)
-#    find_package(OpenCV 3 REQUIRED)
-#    add_executable(HXTIO-OpenCV HXTIO-OpenCV.cpp)
-#    target_link_libraries(HXTIO-OpenCV hxtio opencv_core opencv_imgcodecs)
-#endif()
+# Example App
+add_executable(yanda-usage examples/Usage.cpp)
+target_link_libraries(yanda-usage yanda)
