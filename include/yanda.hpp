@@ -1,7 +1,14 @@
+/**
+ * YANDA: Yet Another N-Dimensional Array
+ * https://github.com/csparker247/yanda
+ */
+
 #pragma once
 
 #include <array>
 #include <exception>
+#include <functional>
+#include <iostream>
 #include <numeric>
 #include <vector>
 
