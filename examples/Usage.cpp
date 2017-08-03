@@ -14,7 +14,7 @@ using Idx = Array4D::Index;
 int main()
 {
     //// 4D Array ////
-    // Equal to int[4][3][2][1]
+    // Equal to int[5][4][3][2]
     Array4D::Extent size4{5, 4, 3, 2};
     Array4D array4(size4);
 
@@ -40,6 +40,13 @@ int main()
         }
     }
     yanda::Print(array3);
+
+    // Be careful to include all of dimensions when accessing an element
+    // This results in a compiler error
+    // val = array3({3,3,3,3});
+
+    // Does not result in compiler error. Returns array3({3,3,0})
+    val = array3({3,3});
 
     //// 2D array ////
     // Get 2D array by slicing the 3D array
