@@ -9,7 +9,7 @@
 using Array4D = yanda::NDimensionalArray<int, 4>;
 using Array3D = yanda::NDimensionalArray<int, 3>;
 using Array2D = yanda::NDimensionalArray<int, 2>;
-using Idx = Array4D::Index;
+using Idx = Array4D::IndexType;
 
 int main()
 {
@@ -19,34 +19,27 @@ int main()
     Array4D array4(size4);
 
     // Assignment
-    array4({4, 3, 2, 1}) = 18;
+    array4(4, 3, 2, 1) = 18;
 
     // Retrieval
-    int val = array4({4, 3, 2, 1});
+    int val = array4(4, 3, 2, 1);
 
     //// 3D array ////
     // Initialize the Extents with a list
-    Array3D array3({4, 3, 2});
+    Array3D array3(4, 3, 2);
 
     // Expand the array
-    array3.setExtents({4, 4, 4});
+    array3.setExtents(4, 4, 4);
 
     // Fill the array
     for (Idx z = 0; z < array3.extents()[0]; z++) {
         for (Idx y = 0; y < array3.extents()[1]; y++) {
             for (Idx x = 0; x < array3.extents()[2]; x++) {
-                array3({z, y, x}) = val++;
+                array3(z, y, x) = val++;
             }
         }
     }
     yanda::Print(array3);
-
-    // Be careful to include all of dimensions when accessing an element
-    // This results in a compiler error
-    // val = array3({3,3,3,3});
-
-    // Does not result in compiler error. Returns array3({3,3,0})
-    val = array3({3,3});
 
     //// 2D array ////
     // Get 2D array by slicing the 3D array
@@ -66,4 +59,12 @@ int main()
     } catch (const std::exception& e) {
         std::cout << "Error: " << e.what() << std::endl;
     }
+
+    //// Weird behavior ////
+    // Be careful to include all of dimensions when accessing an element using
+    // the Index type. This results in a compiler error...
+    //     val = array3(Array3D::Index{3, 3, 3, 3});
+    // but this does not...
+    std::cout << array3(Array3D::Index{3, 3}) << std::endl;
+    // Third value auto-initialized to 0
 }
